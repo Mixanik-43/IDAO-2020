@@ -13,9 +13,6 @@ from scipy.interpolate import splrep, splev
 # In[2]:
 
 
-
-
-
 def smape(satellite_predicted_values, satellite_true_values):
     # the division, addition and subtraction are pointwise
     return np.mean(np.abs((satellite_predicted_values - satellite_true_values)
@@ -74,6 +71,42 @@ def get_satellite_data(data, sat_id):
     '''
     return data[data['sat_id'] == sat_id].reset_index(drop=True)
 
+def insert_previous_and_shift(df,col_name,ind):
+    '''
+    input a data frame (df), column name (col_name), and index (ind)
+    insert previous value of df[col_name] at index and shift the rest 
+    of df[col_name] from ind by +1;
+    This is used for remove_time_jumps_fast
+    '''
+    shifted_series = df[col_name].shift(1)
+    df[col_name].iloc[ind] = df[col_name].iloc[ind-1]
+    df[col_name].iloc[ind+1:] = shifted_series.iloc[ind+1:]
+    return df
+
+def remove_time_jumps_fast(data, features_list=
+                           ('x_sim', 'y_sim', 'z_sim', 'Vx_sim', 'Vy_sim', 'Vz_sim'),
+                           threshold = 0.000001):
+    #time_threshold 0.00003 sufficient for test and train
+    #time_threshold 0.00002 will throw errors
+    '''
+    removes time jumps in the simulation for a single satellite
+    for train and test data, sufficient to set time_threshold at default
+    s_data = satellite data
+    the features are replaced by the correction
+    note that threshold here is not the same as in remove_time_jumps
+    '''
+    data['t'] = ((pd.to_datetime(data['epoch']) - pd.to_datetime(data['epoch'])[0]) /
+                               np.timedelta64(1, 'D')).astype(float)
+    data['dt'] = data['t'].diff(1)
+
+    index_for_correction = data[data['dt'] < threshold].index 
+    print(index_for_correction)
+    if list(index_for_correction): #if non empty
+        for feature in features_list:
+            for i in index_for_correction:
+                data = insert_previous_and_shift(data,feature,i)
+    return data
+
 
 def remove_time_jumps(satellite_data, features_list=('x_sim', 'y_sim', 'z_sim', 'Vx_sim', 'Vy_sim', 'Vz_sim'),
                       suffix='_jumps_removed',time_threshold = 0.00003):
@@ -129,4 +162,16 @@ def remove_time_jumps(satellite_data, features_list=('x_sim', 'y_sim', 'z_sim', 
         corrected_feature[n - 1] = feature[n - 1] + corrected_feature[n - 2] - feature[n - 2]
         corrected_features.append(corrected_feature)
     return pd.DataFrame(corrected_features, index=[f + suffix for f in features_list]).T
+
+
+# In[9]:
+
+
+get_ipython().system('jupyter nbconvert --to script utils_edit_mb.ipynb')
+
+
+# In[ ]:
+
+
+
 
