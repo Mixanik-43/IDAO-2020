@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[12]:
 
 
-#from tqdm import tqdm
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from scipy.interpolate import splrep, splev
 
 
-# In[2]:
+# In[10]:
 
 
 def smape(satellite_predicted_values, satellite_true_values):
@@ -100,7 +100,7 @@ def remove_time_jumps_fast(data, features_list=
     data['dt'] = data['t'].diff(1)
 
     index_for_correction = data[data['dt'] < threshold].index 
-    print(index_for_correction)
+    #print(index_for_correction)
     if list(index_for_correction): #if non empty
         for feature in features_list:
             for i in index_for_correction:
@@ -164,7 +164,7 @@ def remove_time_jumps(satellite_data, features_list=('x_sim', 'y_sim', 'z_sim', 
     return pd.DataFrame(corrected_features, index=[f + suffix for f in features_list]).T
 
 
-# In[9]:
+# In[11]:
 
 
 get_ipython().system('jupyter nbconvert --to script utils_edit_mb.ipynb')
