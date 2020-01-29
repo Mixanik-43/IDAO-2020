@@ -42,7 +42,6 @@ class LinearAlignment:
     # estimates b
     @staticmethod
     def _eval_trend_coef(t, x):
-        return 1
         peaks = utils.get_peaks(x)
         if len(peaks) < 3:
             return 1
