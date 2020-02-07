@@ -21,7 +21,7 @@ def drop_close(t, x, eps=10 ** 9):
     return t[far], x[far]
 
 
-def resample(t, x, step=10 * 10 ** 9, t_new=None, return_t=False):
+def resample(t, x, step=10 * 10 ** 9, t_new=None, return_t=False, drop_close_eps=10 ** 9):
     '''
     t: time array (or series); 
     x: data array (or series); 
@@ -34,7 +34,7 @@ def resample(t, x, step=10 * 10 ** 9, t_new=None, return_t=False):
 
 
     '''
-    t, x = drop_close(t, x)
+    t, x = drop_close(t, x, eps=drop_close_eps)
     if t_new is None:
         t_new = np.arange(t[0], t[-1], step)
     try:
