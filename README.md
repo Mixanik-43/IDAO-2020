@@ -1,10 +1,6 @@
 # IDAO-2020
 
 
-to reproduce submission 5:
+To reproduce submission 30763791:
 
-```
-cd IDAO-2020
-export PYTHONPATH=$PYTHONPATH:$PWD
-python Pipelines/SubmissionFunctions.py
-```
+run track_1_sub_30763791.ipynb
